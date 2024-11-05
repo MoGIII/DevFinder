@@ -1,4 +1,6 @@
+using DevFinder.Constants;
 using DevFinder.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace DevFinder
@@ -14,6 +16,11 @@ namespace DevFinder
                 options.UseSqlServer(builder.Configuration.GetConnectionString("Database"));
             });
 
+            builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+            }).AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
@@ -27,12 +34,20 @@ namespace DevFinder
                 app.UseHsts();
             }
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                RoleSeeder.SeedRolesAsync(services).Wait();
+            }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.MapRazorPages();
 
             app.MapControllerRoute(
                 name: "default",
