@@ -1,5 +1,7 @@
 using DevFinder.Constants;
 using DevFinder.Data;
+using DevFinder.Models;
+using DevFinder.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +22,8 @@ namespace DevFinder
             {
                 options.SignIn.RequireConfirmedAccount = false;
             }).AddRoles<IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+
+            builder.Services.AddScoped<IRepository<JobPosting>, JobPostingRepository>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
